@@ -126,7 +126,7 @@ for filepath in "${SQL_FILES[@]}"; do
     echo "  [apply] ${filename}"
 
     # Run migration inside a transaction so failures leave the DB clean
-    psql_cmd --single-transaction --file="$filepath"
+    psql_cmd --single-transaction -v ON_ERROR_STOP=1 --file="$filepath"
 
     # Record successful application
     psql_cmd --command="
