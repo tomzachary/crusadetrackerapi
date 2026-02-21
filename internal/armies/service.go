@@ -1,11 +1,24 @@
 package armies
 
-import (
-	"net/http"
+import "sync"
 
-	"github.com/gin-gonic/gin"
-)
+type Service struct {
+	mu     sync.RWMutex
+	armies []Army
+}
 
-func getAllArmies(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, "Hello World!")
+func (s *Service) NewService() *Service {
+	return &Service{armies: make([]Army, 0)}
+}
+
+func (s *Service) GetAllArmies() []Army {
+	return s.armies
+}
+
+func (s *Service) CreateOrUpdateArmy() {
+
+}
+
+func (s *Service) DeleteArmy() {
+
 }

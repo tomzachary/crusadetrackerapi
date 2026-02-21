@@ -10,9 +10,10 @@ import (
 )
 
 func StartServer() {
+	armyService := armies.Service{}
 	router := gin.Default()
 
-	armies.RegisterRoutes(router)
+	armyService.RegisterRoutes(router)
 	factions.RegisterRoutes(router)
 	users.RegisterRoutes(router)
 	rosters.RegisterRoutes(router)
