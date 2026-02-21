@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"crusadetrackerapi/internal/router"
 )
 
 func main() {
- fmt.Println("Go!")
+	router.StartServer()
 }
