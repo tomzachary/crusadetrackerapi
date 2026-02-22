@@ -10,14 +10,12 @@ import (
 )
 
 func (s *Service) RegisterRoutes(router *gin.Engine) {
-	service := Service{}
-	{
-		apiV1 := router.Group("/api/v1/armies")
+	apiV1 := router.Group("/api/v1/armies")
 
-		apiV1.GET("/", service.handleGetAllArmies)
-		apiV1.POST("/", service.handlePostArmy)
-		apiV1.DELETE("/:id", service.handleDeleteArmy)
-	}
+	apiV1.GET("/", s.handleGetAllArmies)
+	apiV1.POST("/", s.handlePostArmy)
+	apiV1.PUT("/:id", s.handlePutArmy)
+	apiV1.DELETE("/:id", s.handleDeleteArmy)
 }
 
 func (s *Service) handleGetAllArmies(c *gin.Context) {
@@ -41,10 +39,36 @@ func (s *Service) handlePostArmy(c *gin.Context) {
 		return
 	}
 
-	if army, err := s.CreateOrUpdateArmy(newArmy); err != nil {
+	if army, err := s.CreateArmy(newArmy); err != nil {
 		errorString := fmt.Sprintf("Error creating army: %v\n", err)
 		fmt.Print(errorString)
 		c.String(http.StatusInternalServerError, errorString)
+		return
+	} else {
+		c.IndentedJSON(http.StatusOK, army)
+	}
+}
+
+func (s *Service) handlePutArmy(c *gin.Context) {
+	idStr, ok := c.Params.Get("id")
+	if !ok {
+		c.String(http.StatusBadRequest, "Error: no id given to PUT request")
+		return
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.String(http.StatusBadRequest, fmt.Sprintf("Error parsing id: %v\n", err))
+		return
+	}
+
+	var updatedArmy Army
+	if err := common.ParseBody(c, &updatedArmy); err != nil {
+		c.String(http.StatusInternalServerError, fmt.Sprintf("Error parsing data: %v\n", err))
+		return
+	}
+
+	if army, err := s.UpdateArmy(id, updatedArmy); err != nil {
+		c.String(http.StatusInternalServerError, fmt.Sprintf("Error updating army: %v\n", err))
 		return
 	} else {
 		c.IndentedJSON(http.StatusOK, army)
